@@ -18,13 +18,16 @@ namespace KCBS.HT.RollCall
 {
     public partial class frmRollCallConfig : BaseForm
     {
+        private bool Loaded = false;
         private string _configName = "班導師點名設定";
         private string _initContent = "";
         private QueryHelper _qh = new QueryHelper();
         private UpdateHelper _up = new UpdateHelper();
         private string _defaultPeriodListString = "";
+        private StringBuilder _sbCheckLogBefore = new StringBuilder();        
         private StringBuilder _sbLogBefore = new StringBuilder();
         private StringBuilder _snLogBefore = new StringBuilder();
+        private StringBuilder _sbCheckLogAfter = new StringBuilder();
         private StringBuilder _sbLogAfter = new StringBuilder();
         private StringBuilder _snLogAfter = new StringBuilder();
         private List<XElement> listAbsenceBf = new List<XElement>();
@@ -83,6 +86,21 @@ WHERE
                     listSetting.Add(data);
                 }
                 this._initContent += string.Format(@"<PeriodList>{0}</PeriodList>", string.Join("", listSetting));
+
+                // 2021/03/26 穎驊註記，因應康橋客製，新增班導師點名重覆缺曠檢察設定
+                listSetting = new List<string>();
+                foreach (XElement absence in listAbsence)
+                {
+                    string data = string.Format(@"<Absence Name=""{0}"">false</Absence>", absence.Attribute("Name").Value);
+                    listSetting.Add(data);
+                }
+                // 預設重覆檢查 CrossPeriod 為2，也就是重覆檢查 連續【2】節相同缺曠(EX: 第三節 遲到、第四節 遲到)，
+                // 超過2節以上的檢查過於複雜、且有效能問題，先放置，日後在更新。                
+                this._initContent += string.Format(@"<CheckAbsenceList CrossPeriod = ""2"">{0}</CheckAbsenceList>", string.Join("", listSetting));
+
+                // 班導師 前後幾天可以點名設定
+                this._initContent += @"<DateAuth  BeforeDates= ""2"" AfterDates= ""2""></DateAuth>" ;
+
             }
             #endregion
 
@@ -129,7 +147,7 @@ WHERE
                             listSetting.Add(data);
                         }
                         this._defaultPeriodListString = string.Format(@"<PeriodList>{0}</PeriodList>", string.Join("", listSetting));
-                        sessionDoc = XDocument.Parse("<root>" + dt.Rows[0]["content"]+this._defaultPeriodListString + "</root>");
+                        sessionDoc = XDocument.Parse("<root>" + dt.Rows[0]["content"] + this._defaultPeriodListString + "</root>");
                     }
                 }
                 else
@@ -137,21 +155,97 @@ WHERE
                     dt = insertConfig();
                     sessionDoc = XDocument.Parse("<root>" + dt.Rows[0]["content"] + "</root>");
                 }
-                
+
                 List<XElement> settingList = sessionDoc.Element("root").Element("PeriodList").Elements("Period").ToList();
                 foreach (XElement xElement in settingList)
                 {
                     sessionSetDic.Add("" + xElement.Attribute("Name").Value, "" + xElement.Value);
                 }
-               
+
+            }
+            #endregion
+
+            #region 取得班導師點名重覆缺曠檢察設定
+            Dictionary<string, bool> dicCheckSetting = new Dictionary<string, bool>();
+            {
+                XDocument docRollCall = new XDocument();
+                DataTable dt = GetConfig();
+                if (dt.Rows.Count > 0)
+                {
+                    //2019/4/3 俊緯更新 為符合新的content的格式，所以手動加上<root>
+                    docRollCall = XDocument.Parse("<root>" + dt.Rows[0]["content"] + "</root>");
+                }
+                else
+                {
+                    dt = insertConfig();
+                    docRollCall = XDocument.Parse("<root>" + dt.Rows[0]["content"] + "</root>");
+                }
+                List<XElement> listSetting = docRollCall.Element("root").Element("CheckAbsenceList").Elements("Absence").ToList();
+                foreach (XElement data in listSetting)
+                {
+                    dicCheckSetting.Add(data.Attribute("Name").Value, bool.Parse(data.Value));
+                }
+            }
+            #endregion
+
+            // 預設 前後2天
+            int beforeDate = 2;
+            int afterDate = 2;
+
+            #region 取得班導師點名前後幾天設定           
+            {
+                XDocument docRollCall = new XDocument();
+                DataTable dt = GetConfig();
+                if (dt.Rows.Count > 0)
+                {
+                    //2019/4/3 俊緯更新 為符合新的content的格式，所以手動加上<root>
+                    docRollCall = XDocument.Parse("<root>" + dt.Rows[0]["content"] + "</root>");
+                }
+                else
+                {
+                    dt = insertConfig();
+                    docRollCall = XDocument.Parse("<root>" + dt.Rows[0]["content"] + "</root>");
+                }
+                beforeDate = int.Parse(docRollCall.Element("root").Element("DateAuth").Attribute("BeforeDates").Value);
+                afterDate = int.Parse(docRollCall.Element("root").Element("DateAuth").Attribute("AfterDates").Value);
             }
             #endregion
 
             // Init CheckBox
             ckbxCrossDate.Checked = crossDate;
 
+            beforeDates.Value = beforeDate;
+            afterDates.Value = afterDate;
+
             #region 填資料進dataGridView
             // Init DataGridView
+
+            // Absence
+            foreach (XElement absence in listAbsence)
+            {
+                DataGridViewRow dgvrow = new DataGridViewRow();
+                dgvrow.CreateCells(dgvCheckSetLeaveCategory);
+
+                int col = 0;
+                dgvrow.Cells[col++].Value = absence.Attribute("Name").Value;
+                dgvrow.Cells[col++].Value = dicCheckSetting.ContainsKey(absence.Attribute("Name").Value) ? dicCheckSetting[absence.Attribute("Name").Value] : false;
+
+                dgvCheckSetLeaveCategory.Rows.Add(dgvrow);
+
+                _sbCheckLogBefore.Append("缺曠類別「" + absence.Attribute("Name").Value + "」，" + "缺曠重覆檢查「");
+                if (dicCheckSetting.ContainsKey(absence.Attribute("Name").Value))
+                {
+                    _sbCheckLogBefore.Append(dicCheckSetting[absence.Attribute("Name").Value] ? "是" : "否");
+                }
+                else
+                {
+                    _sbCheckLogBefore.Append("否");
+                }
+                _sbCheckLogBefore.AppendLine("」。"); 
+
+            }
+
+
             // Absence
             foreach (XElement absence in listAbsence)
             {
@@ -163,11 +257,11 @@ WHERE
                 dgvrow.Cells[col++].Value = dicSetting.ContainsKey(absence.Attribute("Name").Value) ? dicSetting[absence.Attribute("Name").Value] : false;
 
                 dgvSetLeaveCategory.Rows.Add(dgvrow);
-                
+
                 _sbLogBefore.Append("缺曠類別「" + absence.Attribute("Name").Value + "」，" + "導師是否可以點名「");
                 if (dicSetting.ContainsKey(absence.Attribute("Name").Value))
                 {
-                    _sbLogBefore.Append(dicSetting[absence.Attribute("Name").Value] ? "是" : "否" );
+                    _sbLogBefore.Append(dicSetting[absence.Attribute("Name").Value] ? "是" : "否");
                 }
                 else
                 {
@@ -175,7 +269,6 @@ WHERE
                 }
                 _sbLogBefore.AppendLine("」。");  //導師原本能點的缺曠類別
 
-            
             }
             // Session
             List<string> sessionSetCategoryList = new List<string>()
@@ -203,13 +296,13 @@ WHERE
                 dgvSetSession.Rows.Add(dgvRow);
 
                 _snLogBefore.AppendLine("原先導師第「" + session.Attribute("Name").Value + "」幾節可點狀態「" + sessionSetDic[session.Attribute("Name").Value] + "」。");
-  //導師原本能點的缺曠類別
+                //導師原本能點的缺曠類別
 
             }
             #endregion
 
-
-
+            // 載入完畢 dgvCheckSetLeaveCategory 可以開始監聽 CellValueChanged
+            Loaded = true;
         }
 
 
@@ -253,8 +346,31 @@ SELECT * FROM insert_data
 
         private void btnSave_Click (object sender, EventArgs e) 
         {
+            List<string> absenceCheckListDataRow = new List<string>();
             List<string> absenceListDataRow = new List<string>();
             List<string> sessionListDataRow = new List<string>();
+
+            foreach (DataGridViewRow dgvrow in dgvCheckSetLeaveCategory.Rows)
+            {
+                string data = string.Format(@"<Absence Name=""{0}"">{1}</Absence>", dgvrow.Cells[0].Value, dgvrow.Cells[1].Value);
+
+                absenceCheckListDataRow.Add(data);
+
+
+                _sbCheckLogAfter.Append("缺曠類別「" + dgvrow.Cells[0].Value + "」，" + "重覆缺曠檢查「");
+
+                if ((bool)dgvrow.Cells[1].Value)
+                {
+                    _sbCheckLogAfter.Append((bool)dgvrow.Cells[1].Value ? "是" : "否");
+                }
+                else
+                {
+                    _sbCheckLogAfter.Append("否");
+                };
+                _sbCheckLogAfter.AppendLine("」。");
+
+            }
+
 
             foreach (DataGridViewRow dgvrow in dgvSetLeaveCategory.Rows)
             {
@@ -289,7 +405,8 @@ SELECT * FROM insert_data
 
                 string content = string.Format(@"<AbsenceList CrossDate = ""{0}"">{1}</AbsenceList>", ckbxCrossDate.Checked, string.Join("", absenceListDataRow));
             content += string.Format(@"<PeriodList>{0}</PeriodList>", string.Join("", sessionListDataRow));
-
+            content += string.Format(@"<CheckAbsenceList CrossPeriod = ""2"">{0}</CheckAbsenceList>", string.Join("", absenceCheckListDataRow));
+            content += string.Format(@"<DateAuth  BeforeDates= ""{0}"" AfterDates= ""{1}""></DateAuth>", beforeDates.Value,afterDates.Value);
             string sql = string.Format(@"
                                         UPDATE list SET
                                             content = '{0}'
@@ -304,7 +421,7 @@ SELECT * FROM insert_data
             {
                 this._up.Execute(sql);
                 ApplicationLog.Log("導師課堂點名", "修改", "缺曠類別: \n"+_sbLogBefore.ToString()+"\n" 
-                    + "節數: \n"+ _snLogBefore.ToString() + "========================== \n"+ "調整後缺曠類別: \n"+ _sbLogAfter.ToString() + "\n" + "調整後節數: \n" + _snLogAfter.ToString());
+                    + "節數: \n"+ _snLogBefore.ToString() + "\n" + "重覆缺曠類別: \n" + _sbCheckLogBefore.ToString() + "========================== \n" + "調整後缺曠類別: \n"+ _sbLogAfter.ToString() + "\n" + "調整後節數: \n" + _snLogAfter.ToString() + "\n" + "調整後重覆缺曠類別: \n" + _sbCheckLogAfter.ToString());
 
 
                 MsgBox.Show("資料儲存成功!");
@@ -318,6 +435,43 @@ SELECT * FROM insert_data
         private void btnLeave_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        // 重覆缺曠 檢查 目前只能夠有一種缺曠類別，這邊做檢查
+        // 另外由於dgv 搭配 checkBox 的特性，不能夠只憑CellValueChanged 來監聽事件，要再搭配CurrentCellDirtyStateChanged
+        // 參考: https://stackoverflow.com/questions/17275166/checkboxes-in-datagridview-not-firing-cellvaluechanged-event/17277193
+        private void dgvCheckSetLeaveCategory_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (!Loaded)
+            {
+                return;
+            }
+
+            if (dgvCheckSetLeaveCategory.CurrentCell == null) return;
+           
+            var columnIndex = 1;
+            if (e.ColumnIndex == columnIndex)
+            {
+                var isChecked = (bool)dgvCheckSetLeaveCategory.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                if (isChecked)
+                {
+                    foreach (DataGridViewRow row in dgvCheckSetLeaveCategory.Rows)
+                    {
+                        if (row.Index != e.RowIndex)
+                        {
+                            row.Cells[columnIndex].Value = !isChecked;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void dgvCheckSetLeaveCategory_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvCheckSetLeaveCategory.IsCurrentCellDirty)
+            {
+                dgvCheckSetLeaveCategory.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
         }
     }
 }
