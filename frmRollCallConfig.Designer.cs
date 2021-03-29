@@ -91,7 +91,7 @@
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvSetLeaveCategory.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvSetLeaveCategory.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(215)))), ((int)(((byte)(229)))));
-            this.dgvSetLeaveCategory.Location = new System.Drawing.Point(289, 39);
+            this.dgvSetLeaveCategory.Location = new System.Drawing.Point(289, 54);
             this.dgvSetLeaveCategory.Name = "dgvSetLeaveCategory";
             this.dgvSetLeaveCategory.RowHeadersVisible = false;
             this.dgvSetLeaveCategory.RowTemplate.Height = 24;
@@ -149,12 +149,13 @@
             this.ckbxCrossDate.BackgroundStyle.Class = "";
             this.ckbxCrossDate.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.ckbxCrossDate.Font = new System.Drawing.Font("微軟正黑體", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.ckbxCrossDate.Location = new System.Drawing.Point(12, 12);
+            this.ckbxCrossDate.Location = new System.Drawing.Point(12, 24);
             this.ckbxCrossDate.Name = "ckbxCrossDate";
             this.ckbxCrossDate.Size = new System.Drawing.Size(235, 23);
             this.ckbxCrossDate.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
             this.ckbxCrossDate.TabIndex = 3;
             this.ckbxCrossDate.Text = "開放線上補點及預先請假";
+            this.ckbxCrossDate.CheckedChanged += new System.EventHandler(this.ckbxCrossDate_CheckedChanged);
             // 
             // dgvSetSession
             // 
@@ -178,7 +179,7 @@
             dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvSetSession.DefaultCellStyle = dataGridViewCellStyle4;
             this.dgvSetSession.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(215)))), ((int)(((byte)(229)))));
-            this.dgvSetSession.Location = new System.Drawing.Point(566, 39);
+            this.dgvSetSession.Location = new System.Drawing.Point(566, 54);
             this.dgvSetSession.Name = "dgvSetSession";
             this.dgvSetSession.RowHeadersVisible = false;
             this.dgvSetSession.RowTemplate.Height = 24;
@@ -308,7 +309,7 @@
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvCheckSetLeaveCategory.DefaultCellStyle = dataGridViewCellStyle6;
             this.dgvCheckSetLeaveCategory.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(215)))), ((int)(((byte)(229)))));
-            this.dgvCheckSetLeaveCategory.Location = new System.Drawing.Point(12, 38);
+            this.dgvCheckSetLeaveCategory.Location = new System.Drawing.Point(12, 53);
             this.dgvCheckSetLeaveCategory.MultiSelect = false;
             this.dgvCheckSetLeaveCategory.Name = "dgvCheckSetLeaveCategory";
             this.dgvCheckSetLeaveCategory.RowHeadersVisible = false;
@@ -345,7 +346,7 @@
             // 
             this.labelX6.BackgroundStyle.Class = "";
             this.labelX6.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX6.Location = new System.Drawing.Point(12, 313);
+            this.labelX6.Location = new System.Drawing.Point(12, 328);
             this.labelX6.Name = "labelX6";
             this.labelX6.Size = new System.Drawing.Size(167, 21);
             this.labelX6.TabIndex = 11;
@@ -368,6 +369,7 @@
             this.CheckPeriodsSetting.Size = new System.Drawing.Size(45, 25);
             this.CheckPeriodsSetting.TabIndex = 18;
             this.CheckPeriodsSetting.Value = 2;
+            this.CheckPeriodsSetting.Visible = false;
             // 
             // labelX7
             // 
@@ -384,6 +386,7 @@
             this.labelX7.Size = new System.Drawing.Size(157, 21);
             this.labelX7.TabIndex = 19;
             this.labelX7.Text = "重覆缺曠檢查連堂數設定:";
+            this.labelX7.Visible = false;
             // 
             // beforeDates
             // 
@@ -394,7 +397,7 @@
             this.beforeDates.BackgroundStyle.Class = "DateTimeInputBackground";
             this.beforeDates.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.beforeDates.ButtonFreeText.Shortcut = DevComponents.DotNetBar.eShortcut.F2;
-            this.beforeDates.Location = new System.Drawing.Point(867, 204);
+            this.beforeDates.Location = new System.Drawing.Point(354, 20);
             this.beforeDates.MaxValue = 5;
             this.beforeDates.MinValue = 0;
             this.beforeDates.Name = "beforeDates";
@@ -412,7 +415,7 @@
             this.afterDates.BackgroundStyle.Class = "DateTimeInputBackground";
             this.afterDates.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.afterDates.ButtonFreeText.Shortcut = DevComponents.DotNetBar.eShortcut.F2;
-            this.afterDates.Location = new System.Drawing.Point(867, 235);
+            this.afterDates.Location = new System.Drawing.Point(457, 20);
             this.afterDates.MaxValue = 5;
             this.afterDates.MinValue = 0;
             this.afterDates.Name = "afterDates";
@@ -432,7 +435,7 @@
             // 
             this.labelX8.BackgroundStyle.Class = "";
             this.labelX8.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX8.Location = new System.Drawing.Point(829, 177);
+            this.labelX8.Location = new System.Drawing.Point(188, 24);
             this.labelX8.Name = "labelX8";
             this.labelX8.Size = new System.Drawing.Size(134, 21);
             this.labelX8.TabIndex = 22;
@@ -449,7 +452,7 @@
             // 
             this.labelX9.BackgroundStyle.Class = "";
             this.labelX9.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX9.Location = new System.Drawing.Point(841, 208);
+            this.labelX9.Location = new System.Drawing.Point(328, 24);
             this.labelX9.Name = "labelX9";
             this.labelX9.Size = new System.Drawing.Size(20, 21);
             this.labelX9.TabIndex = 23;
@@ -466,7 +469,7 @@
             // 
             this.labelX10.BackgroundStyle.Class = "";
             this.labelX10.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX10.Location = new System.Drawing.Point(841, 235);
+            this.labelX10.Location = new System.Drawing.Point(431, 24);
             this.labelX10.Name = "labelX10";
             this.labelX10.Size = new System.Drawing.Size(20, 21);
             this.labelX10.TabIndex = 24;
@@ -483,7 +486,7 @@
             // 
             this.labelX11.BackgroundStyle.Class = "";
             this.labelX11.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX11.Location = new System.Drawing.Point(918, 208);
+            this.labelX11.Location = new System.Drawing.Point(405, 24);
             this.labelX11.Name = "labelX11";
             this.labelX11.Size = new System.Drawing.Size(20, 21);
             this.labelX11.TabIndex = 25;
@@ -500,7 +503,7 @@
             // 
             this.labelX12.BackgroundStyle.Class = "";
             this.labelX12.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.labelX12.Location = new System.Drawing.Point(918, 235);
+            this.labelX12.Location = new System.Drawing.Point(508, 24);
             this.labelX12.Name = "labelX12";
             this.labelX12.Size = new System.Drawing.Size(20, 21);
             this.labelX12.TabIndex = 26;

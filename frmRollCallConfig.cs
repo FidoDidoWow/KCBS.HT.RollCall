@@ -214,6 +214,10 @@ WHERE
             // Init CheckBox
             ckbxCrossDate.Checked = crossDate;
 
+            // 可點前後天數，僅在開放補點預約 選項 有點選時啟動
+            beforeDates.Enabled = ckbxCrossDate.Checked;
+            afterDates.Enabled = ckbxCrossDate.Checked;
+
             beforeDates.Value = beforeDate;
             afterDates.Value = afterDate;
 
@@ -471,6 +475,21 @@ SELECT * FROM insert_data
             if (dgvCheckSetLeaveCategory.IsCurrentCellDirty)
             {
                 dgvCheckSetLeaveCategory.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        // 可點前後天數，僅在開放補點預約 選項 有點選時啟動
+        private void ckbxCrossDate_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckbxCrossDate.Checked)
+            {
+                beforeDates.Enabled = ckbxCrossDate.Checked;
+                afterDates.Enabled = ckbxCrossDate.Checked;
+            }
+            else
+            {
+                beforeDates.Enabled = ckbxCrossDate.Checked;
+                afterDates.Enabled = ckbxCrossDate.Checked;
             }
         }
     }
