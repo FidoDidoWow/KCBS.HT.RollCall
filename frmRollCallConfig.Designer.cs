@@ -61,6 +61,7 @@
             this.labelX10 = new DevComponents.DotNetBar.LabelX();
             this.labelX11 = new DevComponents.DotNetBar.LabelX();
             this.labelX12 = new DevComponents.DotNetBar.LabelX();
+            this.labelX13 = new DevComponents.DotNetBar.LabelX();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSetLeaveCategory)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSetSession)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCheckSetLeaveCategory)).BeginInit();
@@ -509,11 +510,29 @@
             this.labelX12.TabIndex = 26;
             this.labelX12.Text = "天";
             // 
+            // labelX13
+            // 
+            this.labelX13.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelX13.AutoSize = true;
+            this.labelX13.BackColor = System.Drawing.Color.Transparent;
+            // 
+            // 
+            // 
+            this.labelX13.BackgroundStyle.Class = "";
+            this.labelX13.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
+            this.labelX13.Location = new System.Drawing.Point(534, 24);
+            this.labelX13.Name = "labelX13";
+            this.labelX13.Size = new System.Drawing.Size(56, 21);
+            this.labelX13.TabIndex = 27;
+            this.labelX13.Text = "(工作天)";
+            // 
             // frmRollCallConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1081, 351);
+            this.Controls.Add(this.labelX13);
             this.Controls.Add(this.labelX12);
             this.Controls.Add(this.labelX11);
             this.Controls.Add(this.labelX10);
@@ -579,5 +598,6 @@
         private DevComponents.DotNetBar.LabelX labelX10;
         private DevComponents.DotNetBar.LabelX labelX11;
         private DevComponents.DotNetBar.LabelX labelX12;
+        private DevComponents.DotNetBar.LabelX labelX13;
     }
 }
